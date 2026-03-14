@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>유진님이 보낸 편지 💌</title>
+<link href="https://fonts.googleapis.com/css2?family=Nanum+Myeongjo:wght@400;700&family=Nanum+Pen+Script&family=Gowun+Dodum&display=swap" rel="stylesheet">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --red: #c0392b;
+    --red-light: #e74c3c;
+    --red-pale: #fdecea;
+    --red-border: #e8a0a0;
+    --white: #ffffff;
+    --cream: #fffaf9;
+    --text: #2c1a1a;
+    --text-soft: #6b3a3a;
+  }
+
+  body {
+    background: var(--cream);
+    font-family: 'Nanum Myeongjo', serif;
+    color: var(--text);
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow-x: hidden;
+  }
+
+  /* ── POPUP OVERLAY ── */
+  #popup-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(180, 60, 60, 0.18);
+    backdrop-filter: blur(6px);
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    animation: fadeIn 0.5s ease;
+  }
+
+  #popup {
+    background: var(--white);
+    border: 2.5px solid var(--red-border);
+    border-radius: 20px;
+    padding: 44px 36px 36px;
+    max-width: 320px;
+    width: 90%;
+    text-align: center;
+    position: relative;
+    box-shadow: 0 8px 40px rgba(192,57,43,0.13), 0 2px 8px rgba(0,0,0,0.06);
+    animation: popIn 0.5s cubic-bezier(.34,1.56,.64,1);
+  }
+
+  #popup::before {
+    content: '';
+    position: absolute;
+    inset: 6px;
+    border: 1px solid var(--red-border);
+    border-radius: 15px;
+    pointer-events: none;
+    opacity: 0.5;
+  }
+
+  .popup-hearts {
+    font-size: 2rem;
+    letter-spacing: 6px;
+    margin-bottom: 16px;
+    animation: heartbeat 1.4s ease-in-out infinite;
+  }
+
+  .popup-title {
+    font-size: 1.15rem;
+    font-weight: 700;
+    font-family: 'Nanum Myeongjo', serif;
+    color: var(--text);
+    line-height: 1.7;
+    margin-bottom: 28px;
+  }
+
+  .popup-title span {
+    color: var(--red);
+  }
+
+  .popup-btn {
+    background: var(--red);
+    color: white;
+    border: none;
+    border-radius: 50px;
+    padding: 13px 36px;
+    font-family: 'Nanum Myeongjo', serif;
+    font-size: 1rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.25s ease;
+    box-shadow: 0 4px 14px rgba(192,57,43,0.3);
+    letter-spacing: 0.03em;
+  }
+
+  .popup-btn:hover {
+    background: var(--red-light);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(192,57,43,0.35);
+  }
+
+  .popup-btn:active { transform: translateY(0); }
+
+  /* ── LETTER PAGE ── */
+  #letter-page {
+    display: none;
+    width: 100%;
+    min-height: 100vh;
+    padding: 40px 16px 60px;
+    align-items: flex-start;
+    justify-content: center;
+  }
+
+  #letter-page.visible {
+    display: flex;
+    animation: fadeInUp 0.8s ease forwards;
+  }
+
+  .letter-wrap {
+    width: 100%;
+    max-width: 560px;
+  }
+
+  /* Top decoration */
+  .letter-top-deco {
+    text-align: center;
+    margin-bottom: 10px;
+    font-size: 1.3rem;
+    letter-spacing: 10px;
+    color: var(--red);
+    opacity: 0.7;
+    animation: fadeInUp 1s ease 0.2s both;
+  }
+
+  /* Envelope card */
+  .letter-card {
+    background: var(--white);
+    border: 2px solid var(--red-border);
+    border-radius: 18px;
+    padding: 40px 32px 44px;
+    position: relative;
+    box-shadow:
+      0 2px 0 var(--red-border),
+      0 6px 32px rgba(192,57,43,0.08),
+      0 1px 4px rgba(0,0,0,0.04);
+    animation: fadeInUp 1s ease 0.3s both;
+    opacity: 0;
+  }
+
+  /* Inner border */
+  .letter-card::before {
+    content: '';
+    position: absolute;
+    inset: 8px;
+    border: 1px dashed var(--red-border);
+    border-radius: 12px;
+    pointer-events: none;
+    opacity: 0.6;
+  }
+
+  /* Corner hearts */
+  .corner {
+    position: absolute;
+    font-size: 0.85rem;
+    color: var(--red);
+    opacity: 0.5;
+  }
+  .corner.tl { top: 16px; left: 18px; }
+  .corner.tr { top: 16px; right: 18px; }
+  .corner.bl { bottom: 16px; left: 18px; }
+  .corner.br { bottom: 16px; right: 18px; }
+
+  .letter-header {
+    text-align: center;
+    margin-bottom: 28px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid var(--red-border);
+  }
+
+  .letter-badge {
+    display: inline-block;
+    background: var(--red-pale);
+    border: 1px solid var(--red-border);
+    border-radius: 50px;
+    padding: 5px 16px;
+    font-size: 0.72rem;
+    color: var(--red);
+    letter-spacing: 0.1em;
+    margin-bottom: 10px;
+    font-family: 'Gowun Dodum', sans-serif;
+  }
+
+  .letter-title-hearts {
+    font-size: 1.4rem;
+    letter-spacing: 8px;
+    color: var(--red);
+  }
+
+  .letter-body {
+    font-size: 1.45rem;
+    line-height: 2.1;
+    color: var(--text);
+    font-family: 'Nanum Pen Script', cursive;
+  }
+
+  .letter-body p {
+    margin-bottom: 1.4em;
+  }
+
+  .letter-body p:last-child {
+    margin-bottom: 0;
+  }
+
+  .letter-closing {
+    margin-top: 28px;
+    padding-top: 20px;
+    border-top: 1px solid var(--red-border);
+    text-align: right;
+    font-size: 0.95rem;
+    color: var(--text-soft);
+    line-height: 2;
+  }
+
+  .letter-closing .promise {
+    color: var(--red);
+    font-weight: 700;
+    font-size: 1.05rem;
+  }
+
+  /* Bottom deco */
+  .letter-bottom-deco {
+    text-align: center;
+    margin-top: 18px;
+    font-size: 1rem;
+    letter-spacing: 8px;
+    color: var(--red);
+    opacity: 0.5;
+    animation: fadeInUp 1s ease 0.6s both;
+    opacity: 0;
+  }
+
+  /* Music toggle */
+  #music-btn {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    background: var(--red);
+    color: white;
+    border: none;
+    font-size: 1.2rem;
+    cursor: pointer;
+    box-shadow: 0 4px 16px rgba(192,57,43,0.35);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.25s;
+    z-index: 50;
+  }
+
+  #music-btn:hover {
+    background: var(--red-light);
+    transform: scale(1.1);
+  }
+
+  #music-btn.visible { display: flex; }
+
+  /* ── ANIMATIONS ── */
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+
+  @keyframes fadeInUp {
+    from { opacity: 0; transform: translateY(24px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  @keyframes popIn {
+    from { opacity: 0; transform: scale(0.85); }
+    to { opacity: 1; transform: scale(1); }
+  }
+
+  @keyframes heartbeat {
+    0%, 100% { transform: scale(1); }
+    30% { transform: scale(1.12); }
+    60% { transform: scale(0.97); }
+  }
+
+  /* Mobile refinements */
+  @media (max-width: 480px) {
+    .letter-card { padding: 32px 22px 36px; }
+    .letter-body { font-size: 0.95rem; }
+  }
+</style>
+</head>
+<body>
+
+<!-- POPUP -->
+<div id="popup-overlay">
+  <div id="popup">
+    <div class="popup-hearts">♥ ♥ ♥</div>
+    <p class="popup-title">
+      <span>유진</span>님이 보낸 편지를<br>열어보시겠어요? 💌
+    </p>
+    <button class="popup-btn" onclick="openLetter()">열어볼게요 ♥</button>
+  </div>
+</div>
+
+<!-- LETTER -->
+<div id="letter-page">
+  <div class="letter-wrap">
+
+    <div class="letter-top-deco">♥ · · · ♥ · · · ♥</div>
+
+    <div class="letter-card">
+      <span class="corner tl">♥</span>
+      <span class="corner tr">♥</span>
+      <span class="corner bl">♥</span>
+      <span class="corner br">♥</span>
+
+      <div class="letter-header">
+        <div class="letter-badge">1st Anniversary · 2026.03.14</div>
+        <div class="letter-title-hearts">♥ ♥ ♥</div>
+      </div>
+
+      <div class="letter-body">
+        <p>안녕, 내가 편지 쓸 줄 몰랐지?</p>
+
+        <p>지금은 2026년 3월 14일 12시 12분, 주차장에서 1주년을 함께 맞이하고 쭈니가 집에 잘 도착하길 기다리며 몇 줄 적어봐.</p>
+
+        <p>준영이 말처럼 작년 이맘때만 해도 우리 관계가 이렇게까지 깊어질 거라고는 상상도 못 했는데, 시간이 지날수록 서로에게 푹 빠질 수밖에 없는 운명이었다 싶어. 1년을 만났는데도 여전히 쭈니가 생각나고 보고 싶고 어쩔 땐 혹여나 변할까 불안하기도 해. 준영이는 내가 서툴더라도 온 진심을 다해 사랑하는 사람이야. 이런 인연이 나에게 찾아와준 것에 감사해.</p>
+
+        <p>가끔 준영이가 나를 위해 사소한 부분까지 신경 써주고 있다는 게 띵할 정도로 와닿을 때가 있어. 못되게 구는 것도 다 견뎌가며 눈보라와 비바람을 뚫고 우직하게 다가와준 준영이는 유진이가 그리고 기다려온 사람이야. 준영이가 요리 해줄 때, 뷰 좋은 자리에 항상 나를 앉힐 때, 바쁜 와중에도 보러 와줄 때, 매번 바래다줄 때, 내색하지 않고 유진이에게 맞춰줄 때, 바라봐줄 때 내가 이 세상에서 제일 멋있고 섹시한 남자와 만나고 있다는 게 실감나.</p>
+
+        <p>물론 그 과정에서 준영이를 상처받게 하고 아리송하게 만든 거 반성하고 있어. 항상 솔직하고 투명하게 대하려는 마음에 준영이를 배려하지 못하고 이기적으로 굴었어. 그렇지만 준영이를 보면서 둘 사이의 관계를 우선으로 두는 모습만큼 사랑스러운 게 없다는 걸 배워. 쭈니는 이미 놀라운 사랑을 다 주고 있었는데 뭘 더 확인하려하고 투덜댔을까. 이제부터는 2년차 연인으로서 성숙하게 우리 사이에 해가 될 일들 보다는 관계를 이롭게 하는 데 집중해볼게.</p>
+
+        <p>지금까지 그래왔던 것처럼 우리 앞으로도 무엇이든 함께 하자. 1년 사이에 말도 안 되게 많은 추억을 쌓았잖아. 아직도 소소한 장면 하나하나가 다 선명하고 소중해. 그 모든 장면 속 나의 옆에 쭈니가 있었다는 게 괜히 뭉클하기도 하고. 매번 유진이 데리고 어디든 슝 떠나줘서 고마워요 내 사랑. 우리만의 사진첩, 계속해서 알콩달콩 같이 채워가 줄래? 쭈니와 함께라면 매 순간이 즐겁고 설렐 것 같아.</p>
+
+        <p>나는 준영이를 만난 이후로 일상이 행복하고 무슨 일에든 자신이 생겨. 존재만으로 나에게 활력이 되어 주는 준영이처럼 나도 준영이에게 힘이 되어주고 싶어. 이런 나의 다짐이 준영이를 웃게 하길 바라며,</p>
+
+        <p>한결같은 사랑을 줄게. 약속!</p>
+      </div>
+
+      <div class="letter-closing">
+      </div>
+    </div>
+
+    <div class="letter-bottom-deco">♥ · · · ♥ · · · ♥</div>
+  </div>
+</div>
+
+<!-- Music toggle button -->
+<button id="music-btn" onclick="toggleMusic()" title="음악 켜기/끄기">♪</button>
+
+<!-- Background music - upload music.mp3 alongside this file -->
+<audio id="bgm" loop preload="auto">
+  <source src="music.mp3" type="audio/mpeg">
+</audio>
+
+<script>
+  const musicBtn = document.getElementById('music-btn');
+  const bgm = document.getElementById('bgm');
+  let playing = false;
+
+  function openLetter() {
+    const overlay = document.getElementById('popup-overlay');
+    overlay.style.animation = 'fadeIn 0.4s ease reverse forwards';
+    setTimeout(() => {
+      overlay.style.display = 'none';
+      const page = document.getElementById('letter-page');
+      page.classList.add('visible');
+      musicBtn.classList.add('visible');
+      bgm.volume = 0.4;
+      bgm.play().then(() => {
+        playing = true;
+        musicBtn.textContent = '♫';
+      }).catch(() => {
+        musicBtn.textContent = '♪';
+      });
+    }, 400);
+  }
+
+  function toggleMusic() {
+    if (playing) {
+      bgm.pause();
+      musicBtn.textContent = '♪';
+      playing = false;
+    } else {
+      bgm.play();
+      musicBtn.textContent = '♫';
+      playing = true;
+    }
+  }
+</script>
+
+</body>
+</html>
